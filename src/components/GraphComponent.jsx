@@ -22,11 +22,11 @@ const useStyles = makeStyles(theme => ({
 
 
 
-const GraphComponent = () => {
+const GraphComponent = ({ cyRef, handleGraphSubmit }) => {
 
     // for instantiating after render
     const containerRef = useRef(null);
-    const cyRef = useRef(null);
+    // const cyRef = useRef(null);
     const nodeCnt = useRef(2);
     const firstSelectedNodeRef = useRef(null);
     const rootNode = useRef(null);
@@ -147,7 +147,7 @@ const GraphComponent = () => {
 
                     cy.add({
                         group: 'nodes',
-                        data: {id: nodeCnt.current+1, label: `n${nodeCnt.current+1}`, weight: 75},
+                        data: {id: nodeCnt.current+1, label: `n${nodeCnt.current+1}`},
                         position: {x: e.position.x, y: e.position.y}
                     })
                     nodeCnt.current++;
@@ -157,64 +157,9 @@ const GraphComponent = () => {
     });
 
 
-    const handleGraphSubmit = async () => {
-        const cy = cyRef.current;
-        const rootN = rootNode.current;
-        if(graphReady == false) return;
-
-        const vertices = cy.nodes().map(n => ({
-            label: n.id(),
-            coord_x: n.position().x,
-            coord_y: n.position().y
-        }));
-
-        const edges = cy.edges().map(e => ({
-            weight: e.distance,
-            v1: {label: e.source().id(), coord_x: e.sourceEndpoint().x, coord_y: e.sourceEndpoint().y},
-            v2: {label: e.target().id(), coord_x: e.targetEndpoint().x, coord_y: e.targetEndpoint().y}
-        }));
-
-        const root = {
-            label: rootN.id(),
-            coord_x: rootN.position().x,
-            coord_y: rootN.position().y
-        }
-
-        const payload = {
-            root: root,
-            graph: {
-                vertices,
-                edges
-            }
-        }
-
-        const apiUrl = '/api/solve';
-        try{
-            const res = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            // console.log(payload)
-
-            const data = await res.json();
-
-            if(res.ok){
-                console.log(data.jobId);
-            }
-            else console.log('failed');
-        } catch (err){
-            console.log('failed');
-        }
-
-    }
-
 
     return (<div>
-                <button onClick={handleGraphSubmit}>button</button>
+                <button onClick={() => handleGraphSubmit(cyRef, rootNode, graphReady)}>button</button>
                 <div ref={containerRef}
                 className={classes.graph}></div>
             </div>    

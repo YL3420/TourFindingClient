@@ -12,6 +12,7 @@
   "dependencies": {
     "@mui/styles": "^6.4.12",
     "@react-sigma/core": "^5.0.4",
+    "@tailwindcss/vite": "^4.1.11",
     "cytoscape": "^3.2.19",
     "react": "^19.1.0",
     "react-cytoscapejs": "^2.0.0",
