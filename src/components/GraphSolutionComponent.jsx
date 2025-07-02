@@ -57,7 +57,7 @@ const GraphSolutionComponent = ({ allEdges, allNodes }) => {
 
 
     return (
-        <div>
+        <div className='pt-14'>
             {/* { nodes.length } */}
             <div ref={containerRef}
                 className={classes.graph}></div>

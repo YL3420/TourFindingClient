@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
 import GraphComponent from './GraphComponent'
 import GraphSolutionComponent from './GraphSolutionComponent';
+import Spinner from './Spinner';
 
 
 
@@ -10,6 +11,7 @@ const GraphTab = () => {
     const [allNodes, setAllNodes] = useState(null);
     const [allEdges, setAllEdges] = useState(null);
     const [data, setData] = useState(null);
+    const [submitted, setSubmitted] = useState(false);
 
 
 
@@ -49,6 +51,10 @@ const GraphTab = () => {
         const pin = await fetch('/api')
 
         const apiUrl = '/api/solve';
+        
+        setSubmitted(true);
+        setData(null);
+        
         try{
             const res = await fetch(apiUrl, {
                 method: 'POST',
@@ -129,9 +135,20 @@ const GraphTab = () => {
                 <div>
                     <GraphComponent cyRef={cyRef} handleGraphSubmit={handleGraphSubmit} />
                 </div>
-                <div className='pt-14'>
-                    {  data ? 
-                    <GraphSolutionComponent allEdges={allEdges} allNodes={allNodes}  />: <></>
+                <div>
+
+                    { data && submitted &&
+                        <GraphSolutionComponent allEdges={allEdges} allNodes={allNodes}  />
+                    }
+
+                    {
+                        !data && submitted &&
+                        <Spinner loading={true} />
+                    }
+
+                    {
+                        !data && !submitted &&
+                        <></>
                     }
                 </div>
             </div>
