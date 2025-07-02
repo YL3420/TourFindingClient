@@ -45,11 +45,6 @@ const GraphComponent = ({ cyRef, handleGraphSubmit }) => {
                     nodes: [
                         {data: {id: "1", label: "n1"}},
                         {data: {id: "2", label: "n2"}}
-                    ],
-                    edges: [
-                        {data: {id: "1-2", label: "n1-2", source: "1", target: "2", distance: 
-                                calcDistance(100, 100, 200, 100)
-                        }}
                     ]
                 },
                 // panningEnabled:false,

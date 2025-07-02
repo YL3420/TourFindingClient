@@ -56,10 +56,10 @@ const GraphTab = () => {
 
         toast.info('submitted');
 
-        const apiUrl = '/api/solve';
+        const apiUrl = 'https://tsp-api-yl3420.onrender.com/solve';
 
         // pins the server because of the stupid inactivity shutdown on Render
-        const pin = await fetch('/api')
+        const pin = await fetch('https://tsp-api-yl3420.onrender.com/api/solution/1')
 
         setTimeout( async () => {
             try{
@@ -93,7 +93,7 @@ const GraphTab = () => {
     const pollSolution = (jobId) => {
         const interval = setInterval(async () => {
             try{
-                const res = await fetch(`/api/solution/${jobId}`);
+                const res = await fetch(`https://tsp-api-yl3420.onrender.com/api/solution/${jobId}`);
 
                 if (!res.ok) {
                     const errorText = await res.text();
