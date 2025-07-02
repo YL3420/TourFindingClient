@@ -24,6 +24,8 @@ const GraphSolutionComponent = ({ allEdges, allNodes }) => {
                 container: containerRef.current,
                 elements: [...allNodes, ...allEdges],
                 layout: { name: 'preset' },
+                panningEnabled:false,
+                boxSelectionEnabled:false,
                 style: [
                     {
                         selector: 'node',

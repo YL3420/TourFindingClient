@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
 import GraphComponent from './GraphComponent'
 import GraphSolutionComponent from './GraphSolutionComponent';
 
@@ -13,7 +13,7 @@ const GraphTab = () => {
 
 
 
-    const handleGraphSubmit = async (cyRef, rootRef, graphReady) => {
+    const handleGraphSubmit = useCallback(async (cyRef, rootRef, graphReady) => {
         const cy = cyRef.current;
         const rootN = rootRef.current;
         if(graphReady == false) return;
@@ -70,7 +70,7 @@ const GraphTab = () => {
             console.log('failed');
         }
 
-    }
+    }, [])
 
     const pollSolution = (jobId) => {
         const interval = setInterval(async () => {
@@ -124,14 +124,16 @@ const GraphTab = () => {
 
 
     return (
-        <div className='flex flex-row'>
-            <div>
-                <GraphComponent cyRef={cyRef} handleGraphSubmit={handleGraphSubmit} />
-            </div>
-            <div>
-                {  data ? 
-                <GraphSolutionComponent allEdges={allEdges} allNodes={allNodes}  />: <></>
-                }
+        <div className='p-6'>
+            <div className='flex flex-row gap-5'>
+                <div>
+                    <GraphComponent cyRef={cyRef} handleGraphSubmit={handleGraphSubmit} />
+                </div>
+                <div className='pt-14'>
+                    {  data ? 
+                    <GraphSolutionComponent allEdges={allEdges} allNodes={allNodes}  />: <></>
+                    }
+                </div>
             </div>
         </div>
     )
