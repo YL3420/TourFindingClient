@@ -56,7 +56,7 @@ const GraphTab = () => {
 
         toast.info('submitted');
 
-        const apiUrl = 'https://tsp-api-yl3420.onrender.com/solve';
+        const apiUrl = 'https://tsp-api-yl3420.onrender.com/api/solve';
 
         // pins the server because of the stupid inactivity shutdown on Render
         const pin = await fetch('https://tsp-api-yl3420.onrender.com/api/solution/1')
