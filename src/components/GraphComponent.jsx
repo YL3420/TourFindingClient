@@ -14,7 +14,7 @@ const calcDistance = (x1, y1, x2, y2) => {
 
 const useStyles = makeStyles(theme => ({
     graph: {
-        height: 600,
+        height: 500,
         width: 400,
         border: '1px solid #ccc'
     }
@@ -52,7 +52,7 @@ const GraphComponent = ({ cyRef, handleGraphSubmit }) => {
                         }}
                     ]
                 },
-                panningEnabled:false,
+                // panningEnabled:false,
                 boxSelectionEnabled:false,
                 style: [
                     {

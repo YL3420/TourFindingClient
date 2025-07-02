@@ -6,7 +6,7 @@ import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles(theme => ({
     graph: {
-        height: 600,
+        height: 500,
         width: 400,
         border: '1px solid #ccc'
     }
@@ -24,7 +24,7 @@ const GraphSolutionComponent = ({ allEdges, allNodes }) => {
                 container: containerRef.current,
                 elements: [...allNodes, ...allEdges],
                 layout: { name: 'preset' },
-                panningEnabled:false,
+                // panningEnabled:false,
                 boxSelectionEnabled:false,
                 style: [
                     {
