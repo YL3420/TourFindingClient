@@ -15,7 +15,7 @@ const calcDistance = (x1, y1, x2, y2) => {
 const useStyles = makeStyles(theme => ({
     graph: {
         height: 450,
-        width: 400,
+        width: 360,
         border: '1px solid #ccc'
     }
 }));

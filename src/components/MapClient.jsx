@@ -13,7 +13,7 @@ const DEFAULT_MAP_BOUNDS = [
 ]
 
 
-
+const start = [-74.00655, 40.70985];
 
 const MapClient = () => {
     const mapRef = useRef();
@@ -26,6 +26,35 @@ const MapClient = () => {
             bounds: DEFAULT_MAP_BOUNDS,
             minZoom: 13,
         })
+
+        mapRef.current.on('load', () => {
+
+            mapRef.current.addLayer({
+                'id': 'origin-circle',
+                'type': 'circle',
+                'source': {
+                  'type': 'geojson',
+                  'data': {
+                    'type': 'FeatureCollection',
+                    'features': [
+                      {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                          'type': 'Point',
+                          'coordinates': start
+                        }
+                      }
+                    ]
+                  }
+                },
+                'paint': {
+                  'circle-radius': 10,
+                  'circle-color': '#4ce05b'
+                }
+            })
+        })
+
 
         return () => {
             mapRef.current.remove()

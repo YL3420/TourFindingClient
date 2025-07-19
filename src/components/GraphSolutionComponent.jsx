@@ -6,8 +6,8 @@ import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles(theme => ({
     graph: {
-        height: 500,
-        width: 400,
+        height: 450,
+        width: 360,
         border: '1px solid #ccc'
     }
 }));
