@@ -156,8 +156,8 @@ const GraphPage = () => {
 
 
     return (
-        <div className='border-gray-300 rounded-xl border px-6 py-4'>
-            <div className="px-6 flex flex-row gap-16">
+        <div className='border border-gray-300 rounded-xl w-[800px] p-4 flex flex-col'>
+            <div className="flex flex-row gap-16 px-4">
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Controls</h2>
                     <ul className="list-disc list-inside space-y-1 text-sm">

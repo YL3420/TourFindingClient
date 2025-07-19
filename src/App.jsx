@@ -4,8 +4,10 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 import './index.css'
 
 import HomePage from './pages/HomePage'
-import GraphPage from './pages/GraphPage'
 import AppSection from './layouts/AppSection'
+import GraphPage from './pages/GraphPage'
+import MapClient from './components/MapClient'
+
 
 function App() {
   
@@ -20,6 +22,7 @@ function App() {
         <Route path='/' element={<HomePage />}>
           <Route element={<AppSection />}>
             <Route path='/' element={<GraphPage />} />
+            <Route path='/map' element={<MapClient />} />
           </Route>
         </Route>
       </>

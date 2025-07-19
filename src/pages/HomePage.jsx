@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify'
 
 const HomePage = () => {
   return (
-        <main className='flex justify-center items-center min-h-screen'>
+        <main className='flex justify-center items-start min-h-screen'>
           <Header />
 
           <Outlet />
