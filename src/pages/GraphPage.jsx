@@ -103,8 +103,6 @@ const GraphPage = () => {
                     return;
                 }
 
-
-
                 let data = await res.text();
 
                 console.log(data);

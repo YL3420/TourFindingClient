@@ -6,7 +6,7 @@ import './index.css'
 import HomePage from './pages/HomePage'
 import AppSection from './layouts/AppSection'
 import GraphPage from './pages/GraphPage'
-import MapClient from './components/MapClient'
+import MapClient from './pages/MapClient'
 
 
 function App() {
