@@ -264,31 +264,28 @@ const MapClient = () => {
                 <div>
                     <h2 className="text-lg font-semibold mb-2">Controls</h2>
                     <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>Add Node: Click empty space on canvas</li>
-                        <li>Delete Node: Hold on an existing node until it disappears</li>
-                        <li>Make Connection: Click source node, then target node</li>
-                        <li>Select Root Node: Toggle node until yellow border appears</li>
+                        <li>Add Marker/Stop: Click on location on map</li>
                         <li>Camera movement: panning</li>
                     </ul>
                 </div>
                 <div>
-                    <h2 className="text-lg font-semibold mb-2">Constraints</h2>
+                    <h2 className="text-lg font-semibold mb-2">Notes</h2>
                     <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>All nodes must be reachable from the root</li>
-                        <li>No duplicate edges between same nodes</li>
-                        <li>Every two distinct nodes must be connected by an edge</li>
-                        <li>Root must be selected before submitting</li>
+                        <li>Marker must be reachable from a pedastrian route</li>
+                        <li>This map currently supports one mode of travel: walking</li>
+                        <li>First selected marker is the starting location for the trip</li>
                     </ul>
                 </div>
             </div>
             <div className='px-6 py-3'>
 
-            <div className="flex flex-row gap-4 mb-4">
+            <div className="flex flex-row gap-4">
                 <button onClick={() => handleTspRequest()}
                         className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
 
                 <button onClick={() => {
                         setPins([])
+                        setRoutes({})
                         deleteAllEdges()
                     }}
                         className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
