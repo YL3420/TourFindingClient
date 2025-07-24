@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { toast } from 'react-toastify'
 
-import LocMarker from '../components/LocMarker';
+import LocMarker from '../components/LocMarker'
+import { MapboxSearchBox } from '@mapbox/search-js-web'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -11,8 +12,8 @@ const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
 
 const DEFAULT_MAP_BOUNDS = [
-    [-74.03189, 40.69684],
-    [-73.98121, 40.72286]
+    [-76.51344, 42.43822], 
+    [-76.45130, 42.46219]
 ]
 
 
@@ -35,6 +36,30 @@ const MapClient = () => {
 
     const [tspEdges, setTspEdges] = useState([]);
 
+    // console.log('component called')
+
+    const deleteAllEdges = () => {
+        const map = mapRef.current;
+        if (!map) return;
+      
+        if (!map.isStyleLoaded()) {
+            map.once('style.load', deleteAllEdges);
+            return;
+        }
+      
+        const layers = map.getStyle().layers;
+        if (!layers) return;
+      
+        for (const layer of layers) {
+            if (layer.id.startsWith('edge_') && map.getLayer(layer.id)) {
+                map.removeLayer(layer.id);
+                if (map.getSource(layer.id)) {
+                    map.removeSource(layer.id);
+                }
+            }
+        }
+    }
+
     const handleTspRequest = async () => {
         const root = { label: getNodeIdentifier(pins[0][0], pins[0][1]) }
         const vertices = pins.map((pin) => ({label: getNodeIdentifier(pin[0], pin[1]) }))
@@ -52,7 +77,8 @@ const MapClient = () => {
             }
         }
 
-        console.log('hi')
+        console.log(pins.length)
+        toast.info('submitted');
 
         const apiUrl = 'https://tsp-api-yl3420.onrender.com/api/solve';
 
@@ -156,6 +182,7 @@ const MapClient = () => {
     
 
     useEffect(() => {
+        console.log('first use effect called')
         mapRef.current = new mapboxgl.Map({
             accessToken: MAPBOX_ACCESS_TOKEN, 
             container: mapContainerRef.current,
@@ -166,9 +193,17 @@ const MapClient = () => {
 
         mapRef.current.on('load', () => {
             setMapReady(true);
+
+            const searchBox = new MapboxSearchBox()
+            searchBox.accessToken = MAPBOX_ACCESS_TOKEN
+            searchBox.marker = true
+            searchBox.mapboxgl = mapboxgl
+            searchBox.componentOptions = { allowReverse: true, flipCoordinates: true }
+            mapRef.current.addControl(searchBox)
         })
 
         mapRef.current.on('click', async (e) => {
+            console.log('event listener callled')
             const pin = [e.lngLat.lng, e.lngLat.lat]
             
             setPins((prev) => [...prev, pin])
@@ -182,7 +217,11 @@ const MapClient = () => {
 
     // handles the addition of pins
     useEffect(() => {
+        console.log('useEffect called')
+        if (pins.length < 2) return;
+        console.log('useEffect check called')
         for(let i=0; i<pins.length-1; i++){
+            console.log('loop called')
             handleAddRoute(pins[i], pins[pins.length-1])
         }
     }, [pins])
@@ -190,6 +229,7 @@ const MapClient = () => {
 
     // add routes for traveling salesman
     useEffect(() => {
+        deleteAllEdges()
         for(let i=0; i<tspEdges.length; i++){
             const geojson = {
                 'type': 'Feature',
@@ -213,7 +253,7 @@ const MapClient = () => {
                   'line-width': 5,
                   'line-opacity': 0.75
                 }
-            });
+            })
         }
     }, [tspEdges])
     
@@ -243,8 +283,16 @@ const MapClient = () => {
             </div>
             <div className='px-6 py-3'>
 
+            <div className="flex flex-row gap-4 mb-4">
                 <button onClick={() => handleTspRequest()}
-                    className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
+                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
+
+                <button onClick={() => {
+                        setPins([])
+                        deleteAllEdges()
+                    }}
+                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
+            </div>
 
                 <div className='w-[600] h-[450px]'>
                     <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
