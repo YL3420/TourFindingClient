@@ -278,6 +278,9 @@ const MapClient = () => {
         if(token) setVerified(true)
     }
 
+    if (!verified) {
+        console.log('RECAPTCHA_SITE_KEY:', RECAPTCHA_SITE_KEY);
+    }
 
     return (
         <div className='relative w-full flex justify-center'>
