@@ -8,7 +8,7 @@ const MarkerSVG = () => (
         <g filter="url(#filter0_d_2001_2)">
             <path d="M84.5254 40.7407C84.5254 63.2412 54.0169 100 43.8475 100C32.7535 100 3.16949 63.2412 3.16949 40.7407C3.16949 18.2403 21.3816 0 43.8475 0C66.3133 0 84.5254 18.2403 84.5254 40.7407Z" fill="#43538D" />
         </g>
-        <circle cx="43.8983" cy="40.8983" r="33.8983" fill="" />
+        <circle cx="43.8983" cy="40.8983" r="33.8983" fill="#6B82D6" />
         <defs>
             <filter id="filter0_d_2001_2" x="0.169495" y="0" width="87.3559" height="106" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
                 <feFlood floodOpacity="0" result="BackgroundImageFix" />

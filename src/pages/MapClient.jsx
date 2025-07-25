@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { toast } from 'react-toastify'
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import LocMarker from '../components/LocMarker'
 import { MapboxSearchBox } from '@mapbox/search-js-web'
@@ -10,7 +11,8 @@ import TripList from '../components/TripList'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 
-const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY
 
 
 const DEFAULT_MAP_BOUNDS = [
@@ -29,6 +31,8 @@ const getNodeIdentifier = (lng, lat) => {
 
 
 const MapClient = () => {
+    const [verified, setVerified] = useState(false)
+
     const mapRef = useRef();
     const mapContainerRef = useRef();
     const [mapReady, setMapReady] = useState(false);
@@ -184,9 +188,9 @@ const MapClient = () => {
         }
     }
     
-
     useEffect(() => {
-        console.log('first use effect called')
+        if(!verified) return
+
         mapRef.current = new mapboxgl.Map({
             accessToken: MAPBOX_ACCESS_TOKEN, 
             container: mapContainerRef.current,
@@ -194,6 +198,14 @@ const MapClient = () => {
             minZoom: 13,
             style: 'mapbox://styles/mapbox/streets-v12'
         })
+
+        return () => {
+            mapRef.current.remove()
+        }
+    }, [verified])
+
+    useEffect(() => {
+        if(!mapRef.current) return
 
         mapRef.current.on('load', () => {
             setMapReady(true);
@@ -212,15 +224,13 @@ const MapClient = () => {
             
             setPins((prev) => [...prev, pin])
         })
-
-        return () => {
-            mapRef.current.remove()
-        }
-    }, [])
+    }, [verified, mapRef])
 
 
     // handles the addition of pins
     useEffect(() => {
+        if(!mapRef.current) return
+
         console.log('useEffect called')
         if (pins.length < 2) return;
         console.log('useEffect check called')
@@ -233,6 +243,8 @@ const MapClient = () => {
 
     // add routes for traveling salesman
     useEffect(() => {
+        if(!mapRef.current) return
+
         deleteAllEdges()
         for(let i=0; i<tspEdges.length; i++){
             const geojson = {
@@ -262,57 +274,72 @@ const MapClient = () => {
     }, [tspEdges])
     
 
+    const handleRecaptcha = (token) => {
+        if(token) setVerified(true)
+    }
+
+
     return (
         <div className='relative w-full flex justify-center'>
 
             {/* application box of map */}
             <div className='border border-gray-300 rounded-xl w-[800px] p-4 flex flex-col'>
-                <div className="flex flex-row gap-16 px-4">
-                    <div>
-                        <h2 className="text-lg font-semibold mb-2">Controls</h2>
-                        <ul className="list-disc list-inside space-y-1 text-sm">
-                            <li>Add Marker/Stop: Click on location on map</li>
-                            <li>Camera movement: panning</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h2 className="text-lg font-semibold mb-2">Notes</h2>
-                        <ul className="list-disc list-inside space-y-1 text-sm">
-                            <li>Marker must be reachable from a pedastrian route</li>
-                            <li>This map currently supports one mode of travel: walking</li>
-                            <li>First selected marker is the starting location for the trip</li>
-                            <li>TSP currently does not enforce order of visits, it plans routes solely on minimized total distance</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className='px-6 py-3'>
+                {
+                    !verified ? (
+                        <ReCAPTCHA sitekey={RECAPTCHA_SITE_KEY} onChange={handleRecaptcha} />
+                    ) :
+                    (
+                        <>
+                            <div className="flex flex-row gap-16 px-4">
+                                <div>
+                                    <h2 className="text-lg font-semibold mb-2">Controls</h2>
+                                    <ul className="list-disc list-inside space-y-1 text-sm">
+                                        <li>Add Marker/Stop: Click on location on map</li>
+                                        <li>Camera movement: panning</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-semibold mb-2">Notes</h2>
+                                    <ul className="list-disc list-inside space-y-1 text-sm">
+                                        <li>Marker must be reachable from a pedastrian route</li>
+                                        <li>This map currently supports one mode of travel: walking</li>
+                                        <li>First selected marker is the starting location for the trip</li>
+                                        <li>TSP currently does not enforce order of visits, it plans routes solely on minimized total distance</li>
+                                    </ul>
+                                </div>
+                            </div>
 
-                    <div className="flex flex-row gap-4">
-                        <button onClick={() => handleTspRequest()}
-                                className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
+                            <div className='px-6 py-3'>
 
-                        <button onClick={() => {
-                                setPins([])
-                                setOrderedVisit([])
-                                setRoutes({})
-                                deleteAllEdges()
-                                toast.info('cleared')
-                            }}
-                                className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
-                    </div>
-                    
-                    <div className='w-[600] h-[450px]'>
-                        <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
-                    </div>
+                            <div className="flex flex-row gap-4">
+                                <button onClick={() => handleTspRequest()}
+                                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
 
-                    {
-                        (pins.length > 0) && pins.map((coordinates, i) => (
-                            <LocMarker key={i} map={mapRef.current} coordinates={coordinates} label={getNodeIdentifier(coordinates[0], coordinates[1])} hoverBoxLabel={hoveredBoxLabel} />
-                        ))
-                    }
-                
+                                <button onClick={() => {
+                                        setPins([])
+                                        setOrderedVisit([])
+                                        setRoutes({})
+                                        deleteAllEdges()
+                                        toast.info('cleared')
+                                    }}
+                                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
+                            </div>
 
-                </div>
+                            <div className='w-[600] h-[450px]'>
+                                <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
+                            </div>
+
+                            {
+                                (pins.length > 0 && mapRef) && pins.map((coordinates, i) => (
+                                    <LocMarker key={i} map={mapRef.current} coordinates={coordinates} label={getNodeIdentifier(coordinates[0], coordinates[1])} hoverBoxLabel={hoveredBoxLabel} />
+                                ))
+                            }
+
+
+                            </div>
+                        </>
+                    )
+                }
             </div>
             
 
