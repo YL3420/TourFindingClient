@@ -5,6 +5,8 @@ import { toast } from 'react-toastify'
 import LocMarker from '../components/LocMarker'
 import { MapboxSearchBox } from '@mapbox/search-js-web'
 
+import TripList from '../components/TripList'
+
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 
@@ -35,6 +37,8 @@ const MapClient = () => {
     const [routes, setRoutes] = useState({});
 
     const [tspEdges, setTspEdges] = useState([]);
+    const [orderedVisit, setOrderedVisit] = useState([])
+    const [hoveredBoxLabel, setHoveredBoxLabel] = useState('')
 
     // console.log('component called')
 
@@ -132,6 +136,7 @@ const MapClient = () => {
                 console.log(data.tour_cost);
 
                 setTspEdges(constructTspEdges(data))
+                setOrderedVisit(data.vertex_traversal)
 
                 clearInterval(interval)
                 // setDisplaySolution(true);
@@ -172,7 +177,6 @@ const MapClient = () => {
                     v1: { label: v1_id },
                     v2: { label: v2_id },
                     steps: data.geometry
-
                 }
             }))
         } catch(error){
@@ -259,52 +263,66 @@ const MapClient = () => {
     
 
     return (
-        <div className='border border-gray-300 rounded-xl w-[800px] p-4 flex flex-col'>
-            <div className="flex flex-row gap-16 px-4">
-                <div>
-                    <h2 className="text-lg font-semibold mb-2">Controls</h2>
-                    <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>Add Marker/Stop: Click on location on map</li>
-                        <li>Camera movement: panning</li>
-                    </ul>
+        <div className='relative w-full flex justify-center'>
+
+            {/* application box of map */}
+            <div className='border border-gray-300 rounded-xl w-[800px] p-4 flex flex-col'>
+                <div className="flex flex-row gap-16 px-4">
+                    <div>
+                        <h2 className="text-lg font-semibold mb-2">Controls</h2>
+                        <ul className="list-disc list-inside space-y-1 text-sm">
+                            <li>Add Marker/Stop: Click on location on map</li>
+                            <li>Camera movement: panning</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 className="text-lg font-semibold mb-2">Notes</h2>
+                        <ul className="list-disc list-inside space-y-1 text-sm">
+                            <li>Marker must be reachable from a pedastrian route</li>
+                            <li>This map currently supports one mode of travel: walking</li>
+                            <li>First selected marker is the starting location for the trip</li>
+                            <li>TSP currently does not enforce order of visits, it plans routes solely on minimized total distance</li>
+                        </ul>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-lg font-semibold mb-2">Notes</h2>
-                    <ul className="list-disc list-inside space-y-1 text-sm">
-                        <li>Marker must be reachable from a pedastrian route</li>
-                        <li>This map currently supports one mode of travel: walking</li>
-                        <li>First selected marker is the starting location for the trip</li>
-                        <li>TSP currently does not enforce order of visits, it plans routes solely on minimized total distance</li>
-                    </ul>
+                <div className='px-6 py-3'>
+
+                    <div className="flex flex-row gap-4">
+                        <button onClick={() => handleTspRequest()}
+                                className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
+
+                        <button onClick={() => {
+                                setPins([])
+                                setOrderedVisit([])
+                                setRoutes({})
+                                deleteAllEdges()
+                                toast.info('cleared')
+                            }}
+                                className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
+                    </div>
+                    
+                    <div className='w-[600] h-[450px]'>
+                        <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
+                    </div>
+
+                    {
+                        (pins.length > 0) && pins.map((coordinates, i) => (
+                            <LocMarker key={i} map={mapRef.current} coordinates={coordinates} label={getNodeIdentifier(coordinates[0], coordinates[1])} hoverBoxLabel={hoveredBoxLabel} />
+                        ))
+                    }
+                
+
                 </div>
             </div>
-            <div className='px-6 py-3'>
-
-                <div className="flex flex-row gap-4">
-                    <button onClick={() => handleTspRequest()}
-                            className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
-
-                    <button onClick={() => {
-                            setPins([])
-                            setRoutes({})
-                            deleteAllEdges()
-                            toast.info('cleared')
-                        }}
-                            className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
-                </div>
-                
-                <div className='w-[600] h-[450px]'>
-                    <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
-                </div>
-
-                {
-                    (pins.length > 0) && pins.map((coordinates, i) => (
-                        <LocMarker key={i} map={mapRef.current} coordinates={coordinates} />
-                    ))
-                }
             
 
+            <div className="absolute top-4" style={{ left: 'calc(800px + (100% - 800px) / 2)' }}>
+                <TripList 
+                    tspOrderedVisits={orderedVisit}
+                    hoveredBoxLabel={hoveredBoxLabel}
+                    setHoveredBoxLabel={setHoveredBoxLabel} />
             </div>
+
         </div>
     )
 }
