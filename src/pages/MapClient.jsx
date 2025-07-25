@@ -274,23 +274,25 @@ const MapClient = () => {
                         <li>Marker must be reachable from a pedastrian route</li>
                         <li>This map currently supports one mode of travel: walking</li>
                         <li>First selected marker is the starting location for the trip</li>
+                        <li>TSP currently does not enforce order of visits, it plans routes solely on minimized total distance</li>
                     </ul>
                 </div>
             </div>
             <div className='px-6 py-3'>
 
-            <div className="flex flex-row gap-4">
-                <button onClick={() => handleTspRequest()}
-                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
+                <div className="flex flex-row gap-4">
+                    <button onClick={() => handleTspRequest()}
+                            className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Submit Graph</button>
 
-                <button onClick={() => {
-                        setPins([])
-                        setRoutes({})
-                        deleteAllEdges()
-                    }}
-                        className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
-            </div>
-
+                    <button onClick={() => {
+                            setPins([])
+                            setRoutes({})
+                            deleteAllEdges()
+                            toast.info('cleared')
+                        }}
+                            className='mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200'>Clear</button>
+                </div>
+                
                 <div className='w-[600] h-[450px]'>
                     <div id='map-container' className='w-full h-full' ref={mapContainerRef} />
                 </div>
@@ -300,6 +302,8 @@ const MapClient = () => {
                         <LocMarker key={i} map={mapRef.current} coordinates={coordinates} />
                     ))
                 }
+            
+
             </div>
         </div>
     )
